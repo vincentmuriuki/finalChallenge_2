@@ -22,6 +22,22 @@ class SingleOrder(Resource):
         spec_order = CustomerOrder().retrieve_order_by_id(id)
         
         if spec_order:
-            return {"order": spec_order.virtualize()}, 200
+            return jsonify({'Order': spec_order.virtualize()}), 200
 
-        return {"message":"Order not found"}, 404
+        return jsonify({'Message' : "Oops! Specified Order not found in our records"}), 404
+
+    def delete(self, id):
+        spec_order = CustomerOrder().retrieve_order_by_id(id)
+
+        if spec_order:
+            food_orders.remove(spec_order)
+            return jsonify({'Message' : 'Requested Order deleted successfully!'}),200
+        return jsonify({'Message' : 'Oops! Requested Order not found in our records! Try a different ID!'}, 404
+
+    def put(self, id):
+        order = CustomerOrder().retrieve_order_by_id(id)
+
+        if order:
+            order.status="approved"
+            return jsonify({'Message' : 'Order approved!'}), 200
+        return jsonify({'Message' : 'Oops! Specified Order not found in our records!'}), 404
