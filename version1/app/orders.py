@@ -10,11 +10,11 @@ class PostOrder(Resource):
         order = CustomerOrder(data['name'], data["price"],data['description'])
         food_orders.append(order)
 
-        return ({'Message' : 'Congratulations. Your new order has been posted. Kindly wait!'}), 201
+        return jsonify({'Message' : 'Congratulations. Your new order has been posted. Kindly wait!'}), 201
 
 class GetOrders(Resource):
     def get(self):
-        return {"orders":[order.virtualize() for order in food_orders]}
+        return jsonify({"orders" : [order.virtualize() for order in food_orders]})
 
 
 class SingleOrder(Resource):
@@ -26,6 +26,14 @@ class SingleOrder(Resource):
 
         return jsonify({'Message' : "Oops! Specified Order not found in our records"}), 404
 
+    def put(self, id):
+        order = CustomerOrder().retrieve_order_by_id(id)
+
+        if order:
+            order.status="Confirmed"
+            return jsonify({'Message' : 'Order approved!'}), 200
+        return jsonify({'Message' : 'Oops! Specified Order not found in our records!'}), 404
+
     def delete(self, id):
         spec_order = CustomerOrder().retrieve_order_by_id(id)
 
@@ -34,10 +42,5 @@ class SingleOrder(Resource):
             return jsonify({'Message' : 'Requested Order deleted successfully!'}),200
         return jsonify({'Message' : 'Oops! Requested Order not found in our records! Try a different ID!'}, 404
 
-    def put(self, id):
-        order = CustomerOrder().retrieve_order_by_id(id)
 
-        if order:
-            order.status="approved"
-            return jsonify({'Message' : 'Order approved!'}), 200
-        return jsonify({'Message' : 'Oops! Specified Order not found in our records!'}), 404
+
